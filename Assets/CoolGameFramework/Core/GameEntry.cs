@@ -14,6 +14,7 @@ namespace CoolGameFramework.Core
         // 模块快捷访问
         public static EventManager Event { get; private set; }
         public static ResourceManager Resource { get; private set; }
+        public static ObjectPoolManager ObjectPool { get; private set; }
         public static UIManager UI { get; private set; }
         public static SceneManager Scene { get; private set; }
         public static AudioManager Audio { get; private set; }
@@ -28,6 +29,7 @@ namespace CoolGameFramework.Core
         public static DownloadManager Download { get; private set; }
         public static LogManager Log { get; private set; }
         public static HotUpdateManager HotUpdate { get; private set; }
+        public static TweenManager Tween { get; private set; }
 
         protected override void Awake()
         {
@@ -51,6 +53,7 @@ namespace CoolGameFramework.Core
             Timer = ModuleManager.Instance.RegisterModule<TimerManager>();
             Input = ModuleManager.Instance.RegisterModule<InputManager>();
             Resource = ModuleManager.Instance.RegisterModule<ResourceManager>();
+            ObjectPool = ModuleManager.Instance.RegisterModule<ObjectPoolManager>();
             Data = ModuleManager.Instance.RegisterModule<DataManager>();
             Audio = ModuleManager.Instance.RegisterModule<AudioManager>();
             Scene = ModuleManager.Instance.RegisterModule<SceneManager>();
@@ -61,6 +64,7 @@ namespace CoolGameFramework.Core
             Localization = ModuleManager.Instance.RegisterModule<LocalizationManager>();
             SDK = ModuleManager.Instance.RegisterModule<SDKManager>();
             Download = ModuleManager.Instance.RegisterModule<DownloadManager>();
+            Tween = ModuleManager.Instance.RegisterModule<TweenManager>();
             HotUpdate = ModuleManager.Instance.RegisterModule<HotUpdateManager>();
 
             Debug.Log("=== CoolGameFramework Initialized Successfully ===");

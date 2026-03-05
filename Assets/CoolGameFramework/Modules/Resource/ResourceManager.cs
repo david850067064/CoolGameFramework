@@ -124,9 +124,55 @@ namespace CoolGameFramework.Modules
         /// </summary>
         private T LoadFromAssetBundle<T>(string path) where T : Object
         {
-            // TODO: 实现AssetBundle加载逻辑
-            Debug.LogWarning("AssetBundle loading not implemented yet.");
-            return null;
+            // 解析路径：bundleName/assetName
+            string[] parts = path.Split('/');
+            if (parts.Length < 2)
+            {
+                Debug.LogError($"Invalid AssetBundle path format: {path}. Expected format: bundleName/assetName");
+                return null;
+            }
+
+            string bundleName = parts[0];
+            string assetName = parts[1];
+
+            AssetBundle bundle = LoadAssetBundle(bundleName);
+            if (bundle == null)
+            {
+                Debug.LogError($"Failed to load AssetBundle: {bundleName}");
+                return null;
+            }
+
+            return bundle.LoadAsset<T>(assetName);
+        }
+
+        /// <summary>
+        /// 异步从AssetBundle加载
+        /// </summary>
+        private IEnumerator LoadFromAssetBundleAsync<T>(string path, Action<T> onComplete) where T : Object
+        {
+            string[] parts = path.Split('/');
+            if (parts.Length < 2)
+            {
+                Debug.LogError($"Invalid AssetBundle path format: {path}");
+                onComplete?.Invoke(null);
+                yield break;
+            }
+
+            string bundleName = parts[0];
+            string assetName = parts[1];
+
+            AssetBundle bundle = LoadAssetBundle(bundleName);
+            if (bundle == null)
+            {
+                Debug.LogError($"Failed to load AssetBundle: {bundleName}");
+                onComplete?.Invoke(null);
+                yield break;
+            }
+
+            AssetBundleRequest request = bundle.LoadAssetAsync<T>(assetName);
+            yield return request;
+
+            onComplete?.Invoke(request.asset as T);
         }
 
         /// <summary>

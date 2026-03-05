@@ -32,6 +32,7 @@ CoolGameFramework/
 ├── Modules/               # 模块层
 │   ├── Event/            # 事件系统
 │   ├── Resource/         # 资源管理
+│   ├── ObjectPool/       # 对象池
 │   ├── UI/               # UI管理
 │   ├── Scene/            # 场景管理
 │   ├── Audio/            # 音频管理
@@ -44,6 +45,7 @@ CoolGameFramework/
 │   ├── Localization/     # 本地化
 │   ├── SDK/              # SDK集成
 │   ├── Download/         # 下载管理
+│   ├── Tween/            # 动画系统
 │   ├── Log/              # 日志系统
 │   └── HotUpdate/        # 热更新
 ├── Utilities/            # 工具层
@@ -53,7 +55,13 @@ CoolGameFramework/
 │   ├── EncryptUtil.cs
 │   ├── TimeUtil.cs
 │   └── MathUtil.cs
-└── Editor/               # 编辑器工具
+├── Editor/               # 编辑器工具
+│   ├── AssetBundle/      # AB包工具
+│   ├── UI/               # UI工具
+│   ├── Scene/            # 场景工具
+│   ├── Tools/            # 其他工具
+│   └── Settings/         # 设置窗口
+└── Examples/             # 示例代码
 ```
 
 ## 快速开始
@@ -167,6 +175,65 @@ var timer = GameEntry.Timer.LoopCall(1f, () => Debug.Log("Every second"));
 timer.Stop();
 ```
 
+#### Tween动画
+```csharp
+// 移动动画
+GameEntry.Tween.MoveTo(transform, new Vector3(5, 0, 0), 2f)
+    .SetEase(TweenBase.EaseInOutQuad)
+    .OnComplete(() => Debug.Log("Move completed!"));
+
+// 缩放动画
+GameEntry.Tween.ScaleTo(transform, Vector3.one * 2f, 1f);
+
+// 旋转动画
+GameEntry.Tween.RotateTo(transform, new Vector3(0, 180, 0), 1.5f);
+
+// 透明度动画
+GameEntry.Tween.FadeTo(canvasGroup, 0f, 1f);
+
+// 自定义数值动画
+GameEntry.Tween.ValueTo(0f, 100f, 2f, (value) =>
+{
+    Debug.Log($"Current value: {value}");
+});
+```
+
+#### 对象池
+```csharp
+// 创建GameObject对象池
+GameEntry.ObjectPool.CreateGameObjectPool("Bullet", bulletPrefab, 10, 100);
+
+// 从对象池获取
+GameObject bullet = GameEntry.ObjectPool.Spawn("Bullet", position, rotation);
+
+// 回收到对象池
+GameEntry.ObjectPool.Despawn("Bullet", bullet);
+
+// 创建普通对象池
+var pool = GameEntry.ObjectPool.CreateObjectPool<MyClass>(
+    () => new MyClass(),
+    obj => obj.OnGet(),
+    obj => obj.OnRelease(),
+    10
+);
+
+// 使用普通对象池
+MyClass obj = pool.Get();
+pool.Release(obj);
+```
+
+#### 定时器
+```csharp
+// 延迟执行
+GameEntry.Timer.DelayCall(2f, () => Debug.Log("2 seconds later"));
+
+// 循环执行
+var timer = GameEntry.Timer.LoopCall(1f, () => Debug.Log("Every second"));
+
+// 停止定时器
+timer.Stop();
+```
+
 #### 网络请求
 ```csharp
 // HTTP GET
@@ -216,6 +283,7 @@ GameEntry.Localization.ChangeLanguage(SystemLanguage.Chinese);
 
 - **EventManager** - 事件系统，支持类型安全的事件订阅/发布
 - **ResourceManager** - 资源管理，支持多种加载方式
+- **ObjectPoolManager** - 对象池管理，支持GameObject和普通对象池
 - **UIManager** - UI管理，支持多层级UI系统
 - **SceneManager** - 场景管理，支持同步/异步加载
 - **AudioManager** - 音频管理，支持音乐和音效
@@ -228,6 +296,7 @@ GameEntry.Localization.ChangeLanguage(SystemLanguage.Chinese);
 - **LocalizationManager** - 本地化管理
 - **SDKManager** - SDK集成管理
 - **DownloadManager** - 下载管理
+- **TweenManager** - 动画补间系统
 - **LogManager** - 日志管理
 - **HotUpdateManager** - 热更新管理
 
@@ -239,6 +308,24 @@ GameEntry.Localization.ChangeLanguage(SystemLanguage.Chinese);
 - **EncryptUtil** - 加密解密
 - **TimeUtil** - 时间工具
 - **MathUtil** - 数学工具
+
+## 编辑器工具
+
+- **AssetBundle Builder** - AssetBundle打包工具
+- **UI Binder** - UI组件自动绑定工具
+- **Scene Switcher** - 场景快速切换工具
+- **Resource Checker** - 资源检查工具（查找丢失脚本、未使用资源）
+- **Framework Settings** - 框架设置窗口
+
+### 使用编辑器工具
+
+在Unity编辑器菜单栏中找到 `CoolGameFramework` 菜单：
+
+- `CoolGameFramework/Framework Settings` - 打开框架设置
+- `CoolGameFramework/AssetBundle/Build Window` - 打开AB包打包窗口
+- `CoolGameFramework/Scene Switcher` - 打开场景切换工具
+- `CoolGameFramework/Resource Checker` - 打开资源检查工具
+- `GameObject/CoolGameFramework/Add UI Binder` - 为选中的GameObject添加UI绑定器
 
 ## 系统要求
 
