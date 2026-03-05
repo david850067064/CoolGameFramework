@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Video;
 
 namespace CoolGameFramework.Editor
 {
@@ -511,21 +512,66 @@ namespace CoolGameFramework.Editor
         /// </summary>
         private bool IsValidUnityAsset(string assetPath)
         {
-            // 尝试加载资源，如果返回 null 说明 Unity 无法识别
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
-            if (asset == null)
+            // 获取资源的类型
+            Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+
+            if (assetType == null)
             {
                 return false;
             }
 
             // 排除脚本文件
             string extension = Path.GetExtension(assetPath).ToLower();
-            if (extension == ".cs" || extension == ".js" || extension == ".dll")
+            if (extension == ".cs" || extension == ".js" || extension == ".dll" || extension == ".asmdef")
             {
                 return false;
             }
 
-            return true;
+            // Unity 支持的常见资源类型
+            var validTypes = new[]
+            {
+                typeof(GameObject),
+                typeof(Texture),
+                typeof(Texture2D),
+                typeof(Sprite),
+                typeof(Material),
+                typeof(Shader),
+                typeof(AudioClip),
+                typeof(VideoClip),
+                typeof(AnimationClip),
+                typeof(Animator),
+                typeof(RuntimeAnimatorController),
+                typeof(Font),
+                typeof(Mesh),
+                typeof(TextAsset),
+                typeof(SceneAsset),
+                typeof(Cubemap),
+                typeof(PhysicMaterial),
+                typeof(PhysicsMaterial2D),
+                typeof(ComputeShader),
+                typeof(RenderTexture)
+            };
+
+            // 检查是否是支持的类型或其子类
+            foreach (var validType in validTypes)
+            {
+                if (validType.IsAssignableFrom(assetType))
+                {
+                    return true;
+                }
+            }
+
+            // 检查是否是 ScriptableObject（但要排除自定义扩展名）
+            if (typeof(ScriptableObject).IsAssignableFrom(assetType))
+            {
+                // 只允许 .asset 扩展名的 ScriptableObject
+                if (extension == ".asset")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool PassFilter(string assetPath, FilterRule filterRule, string customFilter)
