@@ -2,6 +2,39 @@
 
 一个功能完善、易于扩展的 Unity 游戏开发框架。
 
+## 安装
+
+### 方法1：通过 Unity Package Manager 安装（推荐）
+
+1. 打开 Unity 编辑器
+2. 打开 Package Manager（Window > Package Manager）
+3. 点击左上角的 "+" 按钮
+4. 选择 "Add package from git URL..."
+5. 输入以下 URL：
+   ```
+   https://github.com/david850067064/CoolGameFramework.git?path=/Assets/CoolGameFramework
+   ```
+6. 点击 "Add" 按钮
+
+### 方法2：通过 manifest.json 安装
+
+1. 打开你的 Unity 项目的 `Packages/manifest.json` 文件
+2. 在 `dependencies` 中添加：
+   ```json
+   {
+     "dependencies": {
+       "com.coolgameframework.core": "https://github.com/david850067064/CoolGameFramework.git?path=/Assets/CoolGameFramework",
+       ...
+     }
+   }
+   ```
+3. 保存文件，Unity 会自动安装
+
+### 方法3：手动安装
+
+1. 下载或克隆本仓库
+2. 将 `Assets/CoolGameFramework` 文件夹复制到你的项目的 `Assets` 或 `Packages` 目录
+
 ## 特性
 
 - **模块化设计** - 所有功能模块独立，易于扩展和维护
@@ -66,9 +99,9 @@ CoolGameFramework/
 
 ## 快速开始
 
-### 1. 安装
+### 1. 安装框架
 
-将 `CoolGameFramework` 文件夹复制到你的 Unity 项目的 `Assets` 目录下。
+按照上述安装方法之一安装框架到你的 Unity 项目。
 
 ### 2. 初始化框架
 
