@@ -483,6 +483,13 @@ namespace CoolGameFramework.Editor
 
                 string assetPath = file.Replace("\\", "/");
 
+                // 检查是否是 Unity 可识别的资源
+                if (!IsValidUnityAsset(assetPath))
+                {
+                    Debug.LogWarning($"[AssetBundle] 跳过无法识别的资源: {assetPath}");
+                    continue;
+                }
+
                 // 应用过滤规则
                 if (!PassFilter(assetPath, collector.FilterRule, collector.CustomFilter))
                     continue;
@@ -497,6 +504,28 @@ namespace CoolGameFramework.Editor
 
                 builds[bundleName].Add(assetPath);
             }
+        }
+
+        /// <summary>
+        /// 检查是否是 Unity 可识别的资源
+        /// </summary>
+        private bool IsValidUnityAsset(string assetPath)
+        {
+            // 尝试加载资源，如果返回 null 说明 Unity 无法识别
+            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
+            if (asset == null)
+            {
+                return false;
+            }
+
+            // 排除脚本文件
+            string extension = Path.GetExtension(assetPath).ToLower();
+            if (extension == ".cs" || extension == ".js" || extension == ".dll")
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool PassFilter(string assetPath, FilterRule filterRule, string customFilter)
