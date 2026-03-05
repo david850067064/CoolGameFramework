@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cool Game Framework - Unity游戏开发框架</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        nav li {
+            margin: 0 1rem;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #764ba2;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        .install-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+        }
+
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .module-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .module-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cool Game Framework</h1>
+        <p>功能完善、易于扩展的 Unity 游戏开发框架</p>
+        <div style="margin-top: 1rem;">
+            <a href="https://github.com/david850067064/CoolGameFramework" class="btn">GitHub 仓库</a>
+            <a href="#install" class="btn">快速开始</a>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#features">特性</a></li>
+            <li><a href="#install">安装</a></li>
+            <li><a href="#modules">模块</a></li>
+            <li><a href="#usage">使用示例</a></li>
+            <li><a href="#api">API 文档</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="features" class="section">
+            <h2>核心特性</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <h4>🎯 模块化设计</h4>
+                    <p>17个独立功能模块，按需使用，易于扩展</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🚀 开箱即用</h4>
+                    <p>完整的管理器系统，无需额外配置即可使用</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔥 热更新支持</h4>
+                    <p>支持 HybridCLR 热更新方案</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📦 资源管理</h4>
+                    <p>支持 Resources、AssetBundle 等多种加载方式</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎨 UI管理</h4>
+                    <p>完善的UI层级管理和生命周期控制</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚡ 对象池</h4>
+                    <p>高效的对象复用机制，提升性能</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🌐 网络通信</h4>
+                    <p>支持 TCP/HTTP 等多种网络协议</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🛠️ 编辑器工具</h4>
+                    <p>5个实用编辑器工具，提升开发效率</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="install" class="section">
+            <h2>安装方法</h2>
+
+            <h3>方法1：通过 Unity Package Manager 安装（推荐）</h3>
+            <div class="install-box">
+                <ol>
+                    <li>打开 Unity 编辑器</li>
+                    <li>打开 Package Manager（Window > Package Manager）</li>
+                    <li>点击左上角的 "+" 按钮</li>
+                    <li>选择 "Add package from git URL..."</li>
+                    <li>输入以下 URL：</li>
+                </ol>
+                <pre><code>https://github.com/david850067064/CoolGameFramework.git?path=/Assets/CoolGameFramework</code></pre>
+                <ol start="6">
+                    <li>点击 "Add" 按钮</li>
+                </ol>
+            </div>
+
+            <h3>方法2：通过 manifest.json 安装</h3>
+            <p>打开你的 Unity 项目的 <code>Packages/manifest.json</code> 文件，在 <code>dependencies</code> 中添加：</p>
+            <pre><code>{
+  "dependencies": {
+    "com.coolgameframework.core": "https://github.com/david850067064/CoolGameFramework.git?path=/Assets/CoolGameFramework"
+  }
+}</code></pre>
+
+            <h3>系统要求</h3>
+            <ul>
+                <li>Unity 2020.3 或更高版本</li>
+                <li>.NET Standard 2.1</li>
+            </ul>
+        </section>
+
+        <section id="modules" class="section">
+            <h2>框架模块</h2>
+
+            <h3>核心模块</h3>
+            <div class="module-list">
+                <div class="module-item"><strong>ModuleManager</strong><br>模块管理器</div>
+                <div class="module-item"><strong>GameEntry</strong><br>框架入口</div>
+            </div>
+
+            <h3>功能模块（17个）</h3>
+            <div class="module-list">
+                <div class="module-item"><strong>EventManager</strong><br>事件系统</div>
+                <div class="module-item"><strong>ResourceManager</strong><br>资源管理</div>
+                <div class="module-item"><strong>ObjectPoolManager</strong><br>对象池</div>
+                <div class="module-item"><strong>UIManager</strong><br>UI管理</div>
+                <div class="module-item"><strong>SceneManager</strong><br>场景管理</div>
+                <div class="module-item"><strong>AudioManager</strong><br>音频管理</div>
+                <div class="module-item"><strong>DataManager</strong><br>数据管理</div>
+                <div class="module-item"><strong>NetworkManager</strong><br>网络管理</div>
+                <div class="module-item"><strong>InputManager</strong><br>输入管理</div>
+                <div class="module-item"><strong>TimerManager</strong><br>定时器</div>
+                <div class="module-item"><strong>ProcedureManager</strong><br>流程管理</div>
+                <div class="module-item"><strong>FSMManager</strong><br>状态机</div>
+                <div class="module-item"><strong>LocalizationManager</strong><br>本地化</div>
+                <div class="module-item"><strong>SDKManager</strong><br>SDK集成</div>
+                <div class="module-item"><strong>DownloadManager</strong><br>下载管理</div>
+                <div class="module-item"><strong>TweenManager</strong><br>动画系统</div>
+                <div class="module-item"><strong>LogManager</strong><br>日志系统</div>
+                <div class="module-item"><strong>HotUpdateManager</strong><br>热更新</div>
+            </div>
+
+            <h3>工具类（6个）</h3>
+            <div class="module-list">
+                <div class="module-item">PathUtil</div>
+                <div class="module-item">FileUtil</div>
+                <div class="module-item">JsonUtil</div>
+                <div class="module-item">EncryptUtil</div>
+                <div class="module-item">TimeUtil</div>
+                <div class="module-item">MathUtil</div>
+            </div>
+
+            <h3>编辑器工具（5个）</h3>
+            <div class="module-list">
+                <div class="module-item">AssetBundle Builder</div>
+                <div class="module-item">UI Binder</div>
+                <div class="module-item">Scene Switcher</div>
+                <div class="module-item">Resource Checker</div>
+                <div class="module-item">Framework Settings</div>
+            </div>
+        </section>
+
+        <section id="usage" class="section">
+            <h2>使用示例</h2>
+
+            <h3>初始化框架</h3>
+            <p>在场景中创建一个空物体，添加 <code>GameEntry</code> 组件，框架会自动初始化所有模块。</p>
+            <pre><code>using CoolGameFramework.Core;
+
+// 访问模块
+GameEntry.Event.Subscribe&lt;YourEvent&gt;(OnYourEvent);
+GameEntry.UI.OpenUI&lt;YourUI&gt;("YourUIName");
+GameEntry.Audio.PlayMusic("BackgroundMusic");</code></pre>
+
+            <h3>事件系统</h3>
+            <pre><code>// 定义事件
+public struct PlayerDiedEvent
+{
+    public int PlayerId;
+    public string Reason;
+}
+
+// 订阅事件
+GameEntry.Event.Subscribe&lt;PlayerDiedEvent&gt;(OnPlayerDied);
+
+// 发布事件
+GameEntry.Event.Publish(new PlayerDiedEvent
+{
+    PlayerId = 1,
+    Reason = "Fall"
+});
+
+// 取消订阅
+GameEntry.Event.Unsubscribe&lt;PlayerDiedEvent&gt;(OnPlayerDied);</code></pre>
+
+            <h3>UI管理</h3>
+            <pre><code>// 打开UI
+var mainUI = GameEntry.UI.OpenUI&lt;MainUI&gt;("MainUI", UILayer.Normal);
+
+// 关闭UI
+GameEntry.UI.CloseUI("MainUI");
+
+// 获取UI
+var ui = GameEntry.UI.GetUI&lt;MainUI&gt;("MainUI");</code></pre>
+
+            <h3>资源加载</h3>
+            <pre><code>// 同步加载
+var prefab = GameEntry.Resource.Load&lt;GameObject&gt;("Prefabs/Player");
+
+// 异步加载
+GameEntry.Resource.LoadAsync&lt;GameObject&gt;("Prefabs/Enemy", (asset) =>
+{
+    if (asset != null)
+    {
+        Instantiate(asset);
+    }
+});
+
+// 实例化
+var instance = GameEntry.Resource.Instantiate("Prefabs/Bullet");</code></pre>
+
+            <h3>对象池</h3>
+            <pre><code>// 创建GameObject对象池
+GameEntry.ObjectPool.CreateGameObjectPool("Bullet", bulletPrefab, 10, 100);
+
+// 从对象池获取
+GameObject bullet = GameEntry.ObjectPool.Spawn("Bullet", position, rotation);
+
+// 回收到对象池
+GameEntry.ObjectPool.Despawn("Bullet", bullet);</code></pre>
+
+            <h3>Tween动画</h3>
+            <pre><code>// 移动动画
+GameEntry.Tween.MoveTo(transform, new Vector3(5, 0, 0), 2f)
+    .SetEase(TweenBase.EaseInOutQuad)
+    .OnComplete(() => Debug.Log("Move completed!"));
+
+// 缩放动画
+GameEntry.Tween.ScaleTo(transform, Vector3.one * 2f, 1f);
+
+// 旋转动画
+GameEntry.Tween.RotateTo(transform, new Vector3(0, 180, 0), 1.5f);
+
+// 透明度动画
+GameEntry.Tween.FadeTo(canvasGroup, 0f, 1f);</code></pre>
+
+            <h3>定时器</h3>
+            <pre><code>// 延迟执行
+GameEntry.Timer.DelayCall(2f, () => Debug.Log("2 seconds later"));
+
+// 循环执行
+var timer = GameEntry.Timer.LoopCall(1f, () => Debug.Log("Every second"));
+
+// 停止定时器
+timer.Stop();</code></pre>
+
+            <h3>音频播放</h3>
+            <pre><code>// 播放背景音乐
+GameEntry.Audio.PlayMusic("BGM_Main");
+
+// 播放音效
+GameEntry.Audio.PlaySFX("SFX_Shoot");
+
+// 设置音量
+GameEntry.Audio.SetMusicVolume(0.8f);
+GameEntry.Audio.SetSFXVolume(0.6f);</code></pre>
+        </section>
+
+        <section id="api" class="section">
+            <h2>API 文档</h2>
+            <p>详细的 API 文档请访问 <a href="https://github.com/david850067064/CoolGameFramework" target="_blank">GitHub 仓库</a>。</p>
+
+            <h3>快速链接</h3>
+            <ul>
+                <li><a href="https://github.com/david850067064/CoolGameFramework/blob/main/README.md">完整文档</a></li>
+                <li><a href="https://github.com/david850067064/CoolGameFramework/blob/main/CHANGELOG.md">更新日志</a></li>
+                <li><a href="https://github.com/david850067064/CoolGameFramework/issues">问题反馈</a></li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Cool Game Framework. Licensed under MIT License.</p>
+        <p>Made with ❤️ for Unity Developers</p>
+    </footer>
+</body>
+</html>
