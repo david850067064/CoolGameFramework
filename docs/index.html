@@ -207,6 +207,8 @@
             <li><a href="#install">安装</a></li>
             <li><a href="#modules">模块</a></li>
             <li><a href="#usage">使用示例</a></li>
+            <li><a href="#editor">编辑器工具</a></li>
+            <li><a href="#hotupdate">热更新</a></li>
             <li><a href="#api">API 文档</a></li>
         </ul>
     </nav>
@@ -438,6 +440,363 @@ GameEntry.Audio.PlaySFX("SFX_Shoot");
 // 设置音量
 GameEntry.Audio.SetMusicVolume(0.8f);
 GameEntry.Audio.SetSFXVolume(0.6f);</code></pre>
+        </section>
+
+        <section id="editor" class="section">
+            <h2>编辑器工具使用指南</h2>
+
+            <h3>1. AssetBundle 打包工具</h3>
+            <p><strong>打开方式：</strong>Unity 菜单栏 → <code>CoolGameFramework</code> → <code>AssetBundle</code> → <code>Build Window</code></p>
+
+            <h4>功能说明：</h4>
+            <ul>
+                <li>可视化打包 AssetBundle</li>
+                <li>支持多平台打包（Windows、Android、iOS、WebGL）</li>
+                <li>自动生成资源清单文件</li>
+            </ul>
+
+            <h4>使用步骤：</h4>
+            <ol>
+                <li>在 Project 窗口中选择要打包的资源</li>
+                <li>在 Inspector 窗口底部设置 AssetBundle 名称</li>
+                <li>打开 AssetBundle Build Window</li>
+                <li>选择目标平台</li>
+                <li>点击 "Build AssetBundles" 按钮</li>
+                <li>打包完成后，AB包会生成在 <code>Assets/AssetBundles/[Platform]</code> 目录</li>
+            </ol>
+
+            <pre><code>// 代码中加载 AssetBundle
+GameEntry.Resource.LoadAsync&lt;GameObject&gt;("Prefabs/Player", (asset) =>
+{
+    if (asset != null)
+    {
+        Instantiate(asset);
+    }
+});</code></pre>
+
+            <h3>2. UI 自动绑定工具</h3>
+            <p><strong>打开方式：</strong>选中 UI GameObject → 右键菜单 → <code>CoolGameFramework</code> → <code>Add UI Binder</code></p>
+
+            <h4>功能说明：</h4>
+            <ul>
+                <li>自动绑定 UI 组件到代码</li>
+                <li>支持命名规则自动识别（如：btn_Start、txt_Title、img_Icon）</li>
+                <li>减少手动拖拽组件的工作量</li>
+            </ul>
+
+            <h4>命名规则：</h4>
+            <ul>
+                <li><code>btn_</code> 开头 → 自动识别为 Button</li>
+                <li><code>txt_</code> 开头 → 自动识别为 Text/TextMeshPro</li>
+                <li><code>img_</code> 开头 → 自动识别为 Image</li>
+                <li><code>input_</code> 开头 → 自动识别为 InputField</li>
+                <li><code>slider_</code> 开头 → 自动识别为 Slider</li>
+                <li><code>toggle_</code> 开头 → 自动识别为 Toggle</li>
+            </ul>
+
+            <h4>使用步骤：</h4>
+            <ol>
+                <li>按照命名规则命名 UI 子对象（例如：btn_Start、txt_Title）</li>
+                <li>选中 UI 根对象</li>
+                <li>右键 → CoolGameFramework → Add UI Binder</li>
+                <li>UIBinder 组件会自动添加并绑定所有符合规则的组件</li>
+                <li>在代码中通过 UIBinder 访问组件</li>
+            </ol>
+
+            <pre><code>// 在 UI 脚本中使用
+public class MainUI : MonoBehaviour
+{
+    private UIBinder binder;
+
+    void Start()
+    {
+        binder = GetComponent&lt;UIBinder&gt;();
+
+        // 获取按钮
+        Button startBtn = binder.GetButton("btn_Start");
+        startBtn.onClick.AddListener(OnStartClick);
+
+        // 获取文本
+        Text titleText = binder.GetText("txt_Title");
+        titleText.text = "Welcome";
+    }
+}</code></pre>
+
+            <h3>3. 场景快速切换工具</h3>
+            <p><strong>打开方式：</strong>Unity 菜单栏 → <code>CoolGameFramework</code> → <code>Scene Switcher</code></p>
+
+            <h4>功能说明：</h4>
+            <ul>
+                <li>快速切换项目中的场景</li>
+                <li>显示最近使用的场景</li>
+                <li>支持场景收藏功能</li>
+            </ul>
+
+            <h4>使用方法：</h4>
+            <ol>
+                <li>打开 Scene Switcher 窗口</li>
+                <li>窗口会列出 Build Settings 中的所有场景</li>
+                <li>点击场景名称即可快速切换</li>
+                <li>可以将常用场景添加到收藏夹</li>
+            </ol>
+
+            <h3>4. 资源检查工具</h3>
+            <p><strong>打开方式：</strong>Unity 菜单栏 → <code>CoolGameFramework</code> → <code>Resource Checker</code></p>
+
+            <h4>功能说明：</h4>
+            <ul>
+                <li>查找项目中的丢失脚本（Missing Script）</li>
+                <li>查找未使用的资源</li>
+                <li>检查资源引用关系</li>
+                <li>帮助清理项目，减小包体大小</li>
+            </ul>
+
+            <h4>使用步骤：</h4>
+            <ol>
+                <li>打开 Resource Checker 窗口</li>
+                <li>点击 "Find Missing Scripts" 查找丢失的脚本</li>
+                <li>点击 "Find Unused Assets" 查找未使用的资源</li>
+                <li>查看检查结果，可以批量删除或修复</li>
+            </ol>
+
+            <h3>5. 框架设置窗口</h3>
+            <p><strong>打开方式：</strong>Unity 菜单栏 → <code>CoolGameFramework</code> → <code>Framework Settings</code></p>
+
+            <h4>功能说明：</h4>
+            <ul>
+                <li>配置框架的全局设置</li>
+                <li>设置资源加载路径</li>
+                <li>配置日志级别</li>
+                <li>设置热更新服务器地址</li>
+            </ul>
+
+            <h4>可配置项：</h4>
+            <ul>
+                <li><strong>资源加载模式：</strong>Resources / AssetBundle</li>
+                <li><strong>日志级别：</strong>Debug / Info / Warning / Error</li>
+                <li><strong>是否启用文件日志</strong></li>
+                <li><strong>热更新服务器 URL</strong></li>
+                <li><strong>AssetBundle 输出路径</strong></li>
+            </ul>
+        </section>
+
+        <section id="hotupdate" class="section">
+            <h2>热更新完整指南</h2>
+
+            <h3>1. 准备工作</h3>
+            <h4>安装 HybridCLR（可选）</h4>
+            <p>如果需要热更新 C# 代码，需要先安装 HybridCLR 插件：</p>
+            <ol>
+                <li>访问 <a href="https://github.com/focus-creative-games/hybridclr" target="_blank">HybridCLR GitHub</a></li>
+                <li>按照官方文档安装 HybridCLR</li>
+                <li>配置热更新程序集</li>
+            </ol>
+
+            <h3>2. 打包资源</h3>
+            <h4>步骤1：标记资源</h4>
+            <ol>
+                <li>选择需要热更新的资源（Prefab、场景、材质等）</li>
+                <li>在 Inspector 底部设置 AssetBundle 名称</li>
+                <li>建议按功能模块命名，如：<code>ui/mainmenu</code>、<code>characters/player</code></li>
+            </ol>
+
+            <h4>步骤2：打包 AssetBundle</h4>
+            <ol>
+                <li>打开 <code>CoolGameFramework → AssetBundle → Build Window</code></li>
+                <li>选择目标平台（Android/iOS/Windows）</li>
+                <li>点击 "Build AssetBundles"</li>
+                <li>打包文件会生成在 <code>Assets/AssetBundles/[Platform]</code></li>
+            </ol>
+
+            <h4>步骤3：生成版本信息</h4>
+            <p>创建版本配置文件 <code>version.json</code>：</p>
+            <pre><code>{
+  "Version": "1.0.0",
+  "BuildNumber": 1,
+  "Files": [
+    {
+      "Path": "ui/mainmenu",
+      "MD5": "abc123...",
+      "Size": 102400
+    },
+    {
+      "Path": "characters/player",
+      "MD5": "def456...",
+      "Size": 204800
+    }
+  ]
+}</code></pre>
+
+            <h3>3. 部署热更新服务器</h3>
+            <h4>服务器目录结构：</h4>
+            <pre><code>hotupdate/
+├── version.json          # 版本信息文件
+├── Android/              # Android 平台资源
+│   ├── ui/
+│   │   └── mainmenu
+│   └── characters/
+│       └── player
+├── iOS/                  # iOS 平台资源
+│   ├── ui/
+│   │   └── mainmenu
+│   └── characters/
+│       └── player
+└── HotUpdate.dll         # 热更新代码（可选）</code></pre>
+
+            <h4>上传到服务器：</h4>
+            <ol>
+                <li>将打包好的 AssetBundle 文件上传到服务器</li>
+                <li>将 version.json 上传到服务器根目录</li>
+                <li>确保文件可以通过 HTTP/HTTPS 访问</li>
+            </ol>
+
+            <h3>4. 客户端集成</h3>
+            <h4>初始化热更新管理器：</h4>
+            <pre><code>using CoolGameFramework.Core;
+
+public class GameLauncher : MonoBehaviour
+{
+    void Start()
+    {
+        // 设置热更新服务器地址
+        string versionUrl = "https://your-server.com/hotupdate/version.json";
+        string assetUrl = "https://your-server.com/hotupdate/Android";
+
+        GameEntry.HotUpdate.SetRemoteUrl(versionUrl, assetUrl);
+
+        // 检查更新
+        CheckUpdate();
+    }
+
+    void CheckUpdate()
+    {
+        GameEntry.HotUpdate.CheckUpdate((success, updateType) =>
+        {
+            if (success)
+            {
+                switch (updateType)
+                {
+                    case UpdateType.None:
+                        Debug.Log("已是最新版本");
+                        EnterGame();
+                        break;
+
+                    case UpdateType.Resource:
+                        Debug.Log("发现资源更新");
+                        StartUpdate();
+                        break;
+
+                    case UpdateType.Optional:
+                        Debug.Log("发现可选更新");
+                        // 提示用户是否更新
+                        ShowUpdateDialog();
+                        break;
+
+                    case UpdateType.Force:
+                        Debug.Log("发现强制更新");
+                        // 必须更新才能继续
+                        StartUpdate();
+                        break;
+                }
+            }
+            else
+            {
+                Debug.LogError("检查更新失败");
+            }
+        });
+    }
+
+    void StartUpdate()
+    {
+        GameEntry.HotUpdate.StartUpdate(
+            // 进度回调
+            progress =>
+            {
+                Debug.Log($"下载进度: {progress * 100}%");
+                // 更新进度条 UI
+            },
+            // 完成回调
+            success =>
+            {
+                if (success)
+                {
+                    Debug.Log("更新完成");
+                    // 加载热更新 DLL（如果有）
+                    GameEntry.HotUpdate.LoadHotUpdateDLL();
+                    EnterGame();
+                }
+                else
+                {
+                    Debug.LogError("更新失败");
+                }
+            }
+        );
+    }
+
+    void EnterGame()
+    {
+        // 进入游戏主场景
+        GameEntry.Scene.LoadScene("MainScene");
+    }
+}</code></pre>
+
+            <h3>5. 热更新 C# 代码（使用 HybridCLR）</h3>
+            <h4>步骤1：配置热更新程序集</h4>
+            <ol>
+                <li>创建热更新代码程序集（例如：HotUpdate.dll）</li>
+                <li>在 HybridCLR Settings 中添加该程序集</li>
+                <li>编译生成 DLL 文件</li>
+            </ol>
+
+            <h4>步骤2：上传 DLL 到服务器</h4>
+            <pre><code>hotupdate/
+├── version.json
+├── HotUpdate.dll         # 热更新代码
+└── Android/</code></pre>
+
+            <h4>步骤3：客户端加载 DLL</h4>
+            <pre><code>// 下载并加载热更新 DLL
+GameEntry.HotUpdate.LoadHotUpdateDLL();
+
+// 或者加载多个 DLL
+string[] dllNames = { "HotUpdate.dll", "GameLogic.dll" };
+GameEntry.HotUpdate.LoadHotUpdateDLLs(dllNames);</code></pre>
+
+            <h3>6. 版本管理策略</h3>
+            <h4>版本号规则：</h4>
+            <ul>
+                <li><strong>主版本号（Major）：</strong>重大更新，不兼容旧版本 → 强制更新</li>
+                <li><strong>次版本号（Minor）：</strong>功能更新，兼容旧版本 → 可选更新</li>
+                <li><strong>修订号（Patch）：</strong>Bug 修复 → 资源更新</li>
+            </ul>
+
+            <h4>示例：</h4>
+            <ul>
+                <li><code>1.0.0</code> → <code>2.0.0</code>：强制更新（主版本变化）</li>
+                <li><code>1.0.0</code> → <code>1.1.0</code>：可选更新（次版本变化）</li>
+                <li><code>1.0.0</code> → <code>1.0.1</code>：资源更新（BuildNumber 变化）</li>
+            </ul>
+
+            <h3>7. 测试热更新</h3>
+            <ol>
+                <li>打包初始版本（v1.0.0）并安装到设备</li>
+                <li>修改资源或代码</li>
+                <li>重新打包 AssetBundle</li>
+                <li>更新 version.json（修改版本号和文件列表）</li>
+                <li>上传到服务器</li>
+                <li>启动应用，测试热更新流程</li>
+            </ol>
+
+            <h3>8. 注意事项</h3>
+            <ul>
+                <li>✅ 确保服务器支持 HTTPS（iOS 要求）</li>
+                <li>✅ 做好版本回退机制</li>
+                <li>✅ 热更新前备份本地数据</li>
+                <li>✅ 提供断点续传功能</li>
+                <li>✅ 添加 MD5 校验防止文件损坏</li>
+                <li>⚠️ 不要热更新核心框架代码</li>
+                <li>⚠️ 测试不同网络环境下的更新流程</li>
+            </ul>
         </section>
 
         <section id="api" class="section">
