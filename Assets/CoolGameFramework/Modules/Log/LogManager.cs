@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace CoolGameFramework.Modules
@@ -24,10 +26,67 @@ namespace CoolGameFramework.Modules
         private LogLevel _minLogLevel = LogLevel.Debug;
         private readonly List<string> _logCache = new List<string>();
         private const int MaxCacheSize = 1000;
+        private StreamWriter _logWriter;
+        private string _logFilePath;
 
         public override void OnInit()
         {
             Application.logMessageReceived += OnLogMessageReceived;
+
+            if (_enableFileLog)
+            {
+                InitializeFileLog();
+            }
+        }
+
+        /// <summary>
+        /// 初始化文件日志
+        /// </summary>
+        private void InitializeFileLog()
+        {
+            string logDirectory = Path.Combine(Application.persistentDataPath, "Logs");
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            _logFilePath = Path.Combine(logDirectory, $"Log_{timestamp}.txt");
+
+            try
+            {
+                _logWriter = new StreamWriter(_logFilePath, true, Encoding.UTF8);
+                _logWriter.AutoFlush = true;
+
+                WriteToFile($"=== Log Started at {DateTime.Now} ===");
+                WriteToFile($"Unity Version: {Application.unityVersion}");
+                WriteToFile($"Platform: {Application.platform}");
+                WriteToFile($"Device: {SystemInfo.deviceModel}");
+                WriteToFile("=====================================\n");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to initialize file log: {e.Message}");
+                _enableFileLog = false;
+            }
+        }
+
+        /// <summary>
+        /// 写入文件
+        /// </summary>
+        private void WriteToFile(string message)
+        {
+            if (_logWriter != null)
+            {
+                try
+                {
+                    _logWriter.WriteLine(message);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to write log to file: {e.Message}");
+                }
+            }
         }
 
         /// <summary>
@@ -43,7 +102,18 @@ namespace CoolGameFramework.Modules
         /// </summary>
         public void SetFileLogEnabled(bool enabled)
         {
+            if (_enableFileLog == enabled) return;
+
             _enableFileLog = enabled;
+
+            if (_enableFileLog)
+            {
+                InitializeFileLog();
+            }
+            else
+            {
+                CloseFileLog();
+            }
         }
 
         /// <summary>
@@ -78,6 +148,11 @@ namespace CoolGameFramework.Modules
             }
 
             CacheLog(logMessage);
+
+            if (_enableFileLog)
+            {
+                WriteToFile(logMessage);
+            }
         }
 
         public void LogDebug(string message) => Log(message, LogLevel.Debug);
@@ -88,7 +163,16 @@ namespace CoolGameFramework.Modules
         private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
         {
             if (!_enableFileLog) return;
-            // TODO: 写入文件
+
+            string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+            string logMessage = $"[{timestamp}] [{type}] {condition}";
+
+            if (type == LogType.Error || type == LogType.Exception)
+            {
+                logMessage += $"\n{stackTrace}";
+            }
+
+            WriteToFile(logMessage);
         }
 
         private void CacheLog(string log)
@@ -108,9 +192,72 @@ namespace CoolGameFramework.Modules
             return new List<string>(_logCache);
         }
 
+        /// <summary>
+        /// 关闭文件日志
+        /// </summary>
+        private void CloseFileLog()
+        {
+            if (_logWriter != null)
+            {
+                try
+                {
+                    WriteToFile($"\n=== Log Ended at {DateTime.Now} ===");
+                    _logWriter.Close();
+                    _logWriter.Dispose();
+                    _logWriter = null;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to close log file: {e.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 打开日志文件夹
+        /// </summary>
+        public void OpenLogFolder()
+        {
+            string logDirectory = Path.Combine(Application.persistentDataPath, "Logs");
+            if (Directory.Exists(logDirectory))
+            {
+                Application.OpenURL("file://" + logDirectory);
+            }
+        }
+
+        /// <summary>
+        /// 清理旧日志
+        /// </summary>
+        public void ClearOldLogs(int keepDays = 7)
+        {
+            string logDirectory = Path.Combine(Application.persistentDataPath, "Logs");
+            if (!Directory.Exists(logDirectory)) return;
+
+            try
+            {
+                string[] logFiles = Directory.GetFiles(logDirectory, "*.txt");
+                DateTime threshold = DateTime.Now.AddDays(-keepDays);
+
+                foreach (string file in logFiles)
+                {
+                    FileInfo fileInfo = new FileInfo(file);
+                    if (fileInfo.CreationTime < threshold)
+                    {
+                        File.Delete(file);
+                        Debug.Log($"Deleted old log file: {fileInfo.Name}");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to clear old logs: {e.Message}");
+            }
+        }
+
         public override void OnDestroy()
         {
             Application.logMessageReceived -= OnLogMessageReceived;
+            CloseFileLog();
             _logCache.Clear();
         }
     }

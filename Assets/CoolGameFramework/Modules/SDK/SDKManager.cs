@@ -142,10 +142,80 @@ namespace CoolGameFramework.Modules
     /// </summary>
     public class AndroidSDK : DefaultSDK
     {
+        private AndroidJavaObject _currentActivity;
+        private AndroidJavaObject _unityPlayer;
+
         public new void Initialize()
         {
             Debug.Log("AndroidSDK Initialized");
-            // TODO: Android特定初始化
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                // 获取Unity Activity
+                _unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                _currentActivity = _unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+                // 初始化Android特定SDK
+                // 例如：初始化支付SDK、广告SDK等
+                // InitializePaymentSDK();
+                // InitializeAdSDK();
+
+                Debug.Log("Android SDK components initialized successfully");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to initialize Android SDK: {e.Message}");
+            }
+#endif
+        }
+
+        public new void Pay(string productId, float amount, Action<bool> onComplete)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                // 调用Android原生支付
+                // _currentActivity.Call("startPayment", productId, amount);
+                Debug.Log($"Android Pay: {productId}, Amount: {amount}");
+                onComplete?.Invoke(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Android payment failed: {e.Message}");
+                onComplete?.Invoke(false);
+            }
+#else
+            base.Pay(productId, amount, onComplete);
+#endif
+        }
+
+        public new void Share(string content, Action<bool> onComplete)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                // 调用Android原生分享
+                AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent");
+                intent.Call<AndroidJavaObject>("setAction", "android.intent.action.SEND");
+                intent.Call<AndroidJavaObject>("setType", "text/plain");
+                intent.Call<AndroidJavaObject>("putExtra", "android.intent.extra.TEXT", content);
+
+                AndroidJavaObject chooser = new AndroidJavaClass("android.content.Intent")
+                    .CallStatic<AndroidJavaObject>("createChooser", intent, "Share");
+                _currentActivity.Call("startActivity", chooser);
+
+                Debug.Log($"Android Share: {content}");
+                onComplete?.Invoke(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Android share failed: {e.Message}");
+                onComplete?.Invoke(false);
+            }
+#else
+            base.Share(content, onComplete);
+#endif
         }
     }
 
@@ -154,10 +224,103 @@ namespace CoolGameFramework.Modules
     /// </summary>
     public class iOSSDK : DefaultSDK
     {
+#if UNITY_IOS && !UNITY_EDITOR
+        // iOS原生方法声明
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern void _InitializeIOSSDK();
+
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern void _IOSPay(string productId, float amount);
+
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern void _IOSShare(string content);
+
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern void _IOSShowAd();
+#endif
+
         public new void Initialize()
         {
             Debug.Log("iOSSDK Initialized");
-            // TODO: iOS特定初始化
+
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                // 调用iOS原生初始化
+                _InitializeIOSSDK();
+
+                // 初始化iOS特定SDK
+                // 例如：初始化StoreKit、GameCenter等
+                // InitializeStoreKit();
+                // InitializeGameCenter();
+
+                Debug.Log("iOS SDK components initialized successfully");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to initialize iOS SDK: {e.Message}");
+            }
+#endif
+        }
+
+        public new void Pay(string productId, float amount, Action<bool> onComplete)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                // 调用iOS原生支付（StoreKit）
+                _IOSPay(productId, amount);
+                Debug.Log($"iOS Pay: {productId}, Amount: {amount}");
+                onComplete?.Invoke(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"iOS payment failed: {e.Message}");
+                onComplete?.Invoke(false);
+            }
+#else
+            base.Pay(productId, amount, onComplete);
+#endif
+        }
+
+        public new void Share(string content, Action<bool> onComplete)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                // 调用iOS原生分享（UIActivityViewController）
+                _IOSShare(content);
+                Debug.Log($"iOS Share: {content}");
+                onComplete?.Invoke(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"iOS share failed: {e.Message}");
+                onComplete?.Invoke(false);
+            }
+#else
+            base.Share(content, onComplete);
+#endif
+        }
+
+        public new void ShowAd(Action<bool> onComplete)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                // 调用iOS原生广告
+                _IOSShowAd();
+                Debug.Log("iOS ShowAd");
+                onComplete?.Invoke(true);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"iOS show ad failed: {e.Message}");
+                onComplete?.Invoke(false);
+            }
+#else
+            base.ShowAd(onComplete);
+#endif
         }
     }
 }

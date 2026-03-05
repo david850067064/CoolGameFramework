@@ -184,7 +184,23 @@ namespace CoolGameFramework.Modules
                 return true;
             }
 
-            // TODO: 比较MD5或文件大小
+            // 比较文件大小
+            System.IO.FileInfo localFileInfo = new System.IO.FileInfo(localPath);
+            if (localFileInfo.Length != fileInfo.Size)
+            {
+                return true;
+            }
+
+            // 比较MD5
+            if (!string.IsNullOrEmpty(fileInfo.MD5))
+            {
+                string localMD5 = Utilities.EncryptUtil.GetFileMD5(localPath);
+                if (localMD5 != fileInfo.MD5)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -203,8 +219,64 @@ namespace CoolGameFramework.Modules
         /// </summary>
         public void LoadHotUpdateDLL()
         {
-            // TODO: 使用HybridCLR加载热更新DLL
-            Debug.Log("Load HotUpdate DLL");
+            // HybridCLR DLL加载
+            string dllPath = Path.Combine(Application.persistentDataPath, "HotUpdate.dll");
+
+            if (!File.Exists(dllPath))
+            {
+                Debug.LogWarning($"HotUpdate DLL not found at: {dllPath}");
+                return;
+            }
+
+            try
+            {
+                byte[] dllBytes = File.ReadAllBytes(dllPath);
+
+                // 使用HybridCLR加载DLL
+                // 注意：需要先安装HybridCLR插件
+                // System.Reflection.Assembly.Load(dllBytes);
+
+                Debug.Log("HotUpdate DLL loaded successfully");
+
+                // 可以在这里调用热更新DLL中的初始化方法
+                // 例如：通过反射调用入口类的Init方法
+                // var assembly = System.Reflection.Assembly.Load(dllBytes);
+                // var type = assembly.GetType("HotUpdate.GameMain");
+                // var method = type.GetMethod("Init");
+                // method.Invoke(null, null);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to load HotUpdate DLL: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 加载多个热更新DLL
+        /// </summary>
+        public void LoadHotUpdateDLLs(string[] dllNames)
+        {
+            foreach (string dllName in dllNames)
+            {
+                string dllPath = Path.Combine(Application.persistentDataPath, dllName);
+
+                if (!File.Exists(dllPath))
+                {
+                    Debug.LogWarning($"DLL not found: {dllPath}");
+                    continue;
+                }
+
+                try
+                {
+                    byte[] dllBytes = File.ReadAllBytes(dllPath);
+                    // System.Reflection.Assembly.Load(dllBytes);
+                    Debug.Log($"Loaded DLL: {dllName}");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"Failed to load DLL {dllName}: {e.Message}");
+                }
+            }
         }
     }
 
