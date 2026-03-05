@@ -58,10 +58,6 @@ namespace CoolGameFramework.Modules
             {
                 _assetCache[path] = asset;
             }
-            else
-            {
-                Debug.LogError($"Failed to load asset: {path}");
-            }
 
             return asset;
         }
