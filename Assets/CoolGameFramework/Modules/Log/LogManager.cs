@@ -240,7 +240,7 @@ namespace CoolGameFramework.Modules
 
                 foreach (string file in logFiles)
                 {
-                    FileInfo fileInfo = new FileInfo(file);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(file);
                     if (fileInfo.CreationTime < threshold)
                     {
                         File.Delete(file);
