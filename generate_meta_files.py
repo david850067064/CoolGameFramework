@@ -112,6 +112,7 @@ def generate_meta_files(root_dir):
                 print(f"Created: {meta_path}")
 
 if __name__ == "__main__":
-    framework_path = "D:/CoolGameFramework/Assets/CoolGameFramework"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    framework_path = os.path.join(script_dir, "Assets", "CoolGameFramework")
     generate_meta_files(framework_path)
     print("\n✓ All .meta files generated successfully!")
