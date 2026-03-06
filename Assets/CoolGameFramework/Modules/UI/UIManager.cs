@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ namespace CoolGameFramework.Modules
         public override int Priority => 6;
 
         private readonly Dictionary<string, UIBase> _openedUIs = new Dictionary<string, UIBase>();
-        private readonly Stack<UIBase> _uiStack = new Stack<UIBase>();
+        private readonly List<UIBase> _uiStack = new List<UIBase>();
         private Transform _uiRoot;
         private Canvas _canvas;
 
@@ -94,7 +93,7 @@ namespace CoolGameFramework.Modules
             ui.Show();
 
             _openedUIs[uiName] = ui;
-            _uiStack.Push(ui);
+            _uiStack.Add(ui);
 
             return ui;
         }
@@ -110,11 +109,7 @@ namespace CoolGameFramework.Modules
                 ui.OnDestroy();
                 GameObject.Destroy(ui.gameObject);
                 _openedUIs.Remove(uiName);
-
-                if (_uiStack.Count > 0 && _uiStack.Peek() == ui)
-                {
-                    _uiStack.Pop();
-                }
+                _uiStack.Remove(ui);
             }
         }
 

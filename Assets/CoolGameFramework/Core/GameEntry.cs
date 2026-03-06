@@ -30,6 +30,7 @@ namespace CoolGameFramework.Core
         public static LogManager Log { get; private set; }
         public static HotUpdateManager HotUpdate { get; private set; }
         public static TweenManager Tween { get; private set; }
+        public static SaveManager Save { get; private set; }
 
         protected override void Awake()
         {
@@ -53,6 +54,7 @@ namespace CoolGameFramework.Core
             Timer = ModuleManager.Instance.RegisterModule<TimerManager>();
             Input = ModuleManager.Instance.RegisterModule<InputManager>();
             Resource = ModuleManager.Instance.RegisterModule<ResourceManager>();
+            Save = ModuleManager.Instance.RegisterModule<SaveManager>();
             ObjectPool = ModuleManager.Instance.RegisterModule<ObjectPoolManager>();
             Data = ModuleManager.Instance.RegisterModule<DataManager>();
             Audio = ModuleManager.Instance.RegisterModule<AudioManager>();

@@ -12,6 +12,7 @@ namespace CoolGameFramework.Modules
 
         private AudioSource _musicSource;
         private List<AudioSource> _sfxSources = new List<AudioSource>();
+        private int[] _sfxPriorities; // 与 _sfxSources 并行，记录各 Source 当前播放优先级
         private GameObject _audioRoot;
 
         private float _musicVolume = 1f;
@@ -42,6 +43,7 @@ namespace CoolGameFramework.Modules
                 sfxSource.playOnAwake = false;
                 _sfxSources.Add(sfxSource);
             }
+            _sfxPriorities = new int[MaxSFXSources];
         }
 
         /// <summary>
@@ -86,16 +88,27 @@ namespace CoolGameFramework.Modules
         /// <summary>
         /// 播放音效
         /// </summary>
-        public void PlaySFX(string sfxName, float volumeScale = 1f)
+        /// <param name="sfxName">音效资源名</param>
+        /// <param name="volumeScale">音量缩放</param>
+        /// <param name="priority">优先级（越高越不易被抢占，默认 0）</param>
+        public void PlaySFX(string sfxName, float volumeScale = 1f, int priority = 0)
         {
             AudioClip clip = Core.GameEntry.Resource.Load<AudioClip>($"Audio/SFX/{sfxName}");
             if (clip != null)
             {
-                AudioSource source = GetAvailableSFXSource();
-                if (source != null)
+                int sourceIndex = GetAvailableSFXSourceIndex(priority);
+                if (sourceIndex >= 0)
                 {
+                    AudioSource source = _sfxSources[sourceIndex];
+                    source.Stop(); // 停止当前音效（空闲 Source 无影响）
                     source.volume = (_sfxMuted ? 0 : _sfxVolume) * volumeScale;
-                    source.PlayOneShot(clip);
+                    source.clip = clip;
+                    source.Play();
+                    _sfxPriorities[sourceIndex] = priority;
+                }
+                else
+                {
+                    Debug.LogWarning($"[AudioManager] All SFX sources are busy with higher or equal priority. Skipping: {sfxName}");
                 }
             }
         }
@@ -149,16 +162,32 @@ namespace CoolGameFramework.Modules
             _sfxMuted = mute;
         }
 
-        private AudioSource GetAvailableSFXSource()
+        /// <summary>
+        /// 获取可用 SFX Source 的索引：优先返回空闲 Source；
+        /// 无空闲时返回优先级最低且低于 requestPriority 的 Source；
+        /// 否则返回 -1（跳过）。
+        /// </summary>
+        private int GetAvailableSFXSourceIndex(int requestPriority)
         {
-            foreach (var source in _sfxSources)
+            // 优先找空闲 Source
+            for (int i = 0; i < _sfxSources.Count; i++)
             {
-                if (!source.isPlaying)
+                if (!_sfxSources[i].isPlaying)
+                    return i;
+            }
+
+            // 无空闲时找优先级最低的 Source，若低于请求优先级则抢占
+            int lowestPriority = requestPriority;
+            int lowestIndex = -1;
+            for (int i = 0; i < _sfxSources.Count; i++)
+            {
+                if (_sfxPriorities[i] < lowestPriority)
                 {
-                    return source;
+                    lowestPriority = _sfxPriorities[i];
+                    lowestIndex = i;
                 }
             }
-            return _sfxSources[0]; // 如果都在播放，返回第一个
+            return lowestIndex;
         }
 
         public override void OnDestroy()

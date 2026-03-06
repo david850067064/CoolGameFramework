@@ -24,13 +24,24 @@ namespace CoolGameFramework.Modules
         private bool _enableLog = true;
         private bool _enableFileLog = false;
         private LogLevel _minLogLevel = LogLevel.Debug;
-        private readonly List<string> _logCache = new List<string>();
+
+        // 循环队列缓存，O(1) 读写
+        private string[] _cacheBuffer;
+        private int _cacheHead;
+        private int _cacheTail;
+        private int _cacheCount;
         private const int MaxCacheSize = 1000;
+
         private StreamWriter _logWriter;
         private string _logFilePath;
 
         public override void OnInit()
         {
+            _cacheBuffer = new string[MaxCacheSize];
+            _cacheHead = 0;
+            _cacheTail = 0;
+            _cacheCount = 0;
+
             Application.logMessageReceived += OnLogMessageReceived;
 
             if (_enableFileLog)
@@ -177,19 +188,30 @@ namespace CoolGameFramework.Modules
 
         private void CacheLog(string log)
         {
-            _logCache.Add(log);
-            if (_logCache.Count > MaxCacheSize)
+            _cacheBuffer[_cacheTail] = log;
+            _cacheTail = (_cacheTail + 1) % MaxCacheSize;
+            if (_cacheCount < MaxCacheSize)
             {
-                _logCache.RemoveAt(0);
+                _cacheCount++;
+            }
+            else
+            {
+                // 缓存已满，推进头指针覆盖最旧数据
+                _cacheHead = (_cacheHead + 1) % MaxCacheSize;
             }
         }
 
         /// <summary>
-        /// 获取日志缓存
+        /// 获取日志缓存（按时间顺序）
         /// </summary>
         public List<string> GetLogCache()
         {
-            return new List<string>(_logCache);
+            var result = new List<string>(_cacheCount);
+            for (int i = 0; i < _cacheCount; i++)
+            {
+                result.Add(_cacheBuffer[(_cacheHead + i) % MaxCacheSize]);
+            }
+            return result;
         }
 
         /// <summary>
@@ -258,7 +280,7 @@ namespace CoolGameFramework.Modules
         {
             Application.logMessageReceived -= OnLogMessageReceived;
             CloseFileLog();
-            _logCache.Clear();
+            _cacheBuffer = null;
         }
     }
 }

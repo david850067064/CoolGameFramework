@@ -78,16 +78,26 @@ namespace CoolGameFramework.Modules
 
         private IEnumerator LoadAsyncCoroutine<T>(string path, Action<T> onComplete) where T : Object
         {
-            ResourceRequest request = Resources.LoadAsync<T>(path);
-            yield return request;
-
-            T asset = request.asset as T;
-            if (asset != null)
+            switch (_currentLoadMode)
             {
-                _assetCache[path] = asset;
+                case LoadMode.Resources:
+                {
+                    ResourceRequest request = Resources.LoadAsync<T>(path);
+                    yield return request;
+                    T asset = request.asset as T;
+                    if (asset != null)
+                        _assetCache[path] = asset;
+                    onComplete?.Invoke(asset);
+                    break;
+                }
+                case LoadMode.AssetBundle:
+                    yield return LoadFromAssetBundleAsync(path, onComplete);
+                    break;
+                case LoadMode.Addressable:
+                    Debug.LogWarning($"[ResourceManager] Addressable async load is not implemented. Falling back to sync for: {path}");
+                    onComplete?.Invoke(Load<T>(path));
+                    break;
             }
-
-            onComplete?.Invoke(asset);
         }
 
         /// <summary>
@@ -120,16 +130,15 @@ namespace CoolGameFramework.Modules
         /// </summary>
         private T LoadFromAssetBundle<T>(string path) where T : Object
         {
-            // 解析路径：bundleName/assetName
-            string[] parts = path.Split('/');
-            if (parts.Length < 2)
+            int slashIndex = path.IndexOf('/');
+            if (slashIndex < 0)
             {
                 Debug.LogError($"Invalid AssetBundle path format: {path}. Expected format: bundleName/assetName");
                 return null;
             }
 
-            string bundleName = parts[0];
-            string assetName = parts[1];
+            string bundleName = path.Substring(0, slashIndex);
+            string assetName = path.Substring(slashIndex + 1);
 
             AssetBundle bundle = LoadAssetBundle(bundleName);
             if (bundle == null)
@@ -146,16 +155,16 @@ namespace CoolGameFramework.Modules
         /// </summary>
         private IEnumerator LoadFromAssetBundleAsync<T>(string path, Action<T> onComplete) where T : Object
         {
-            string[] parts = path.Split('/');
-            if (parts.Length < 2)
+            int slashIndex = path.IndexOf('/');
+            if (slashIndex < 0)
             {
-                Debug.LogError($"Invalid AssetBundle path format: {path}");
+                Debug.LogError($"Invalid AssetBundle path format: {path}. Expected format: bundleName/assetName");
                 onComplete?.Invoke(null);
                 yield break;
             }
 
-            string bundleName = parts[0];
-            string assetName = parts[1];
+            string bundleName = path.Substring(0, slashIndex);
+            string assetName = path.Substring(slashIndex + 1);
 
             AssetBundle bundle = LoadAssetBundle(bundleName);
             if (bundle == null)
@@ -168,7 +177,10 @@ namespace CoolGameFramework.Modules
             AssetBundleRequest request = bundle.LoadAssetAsync<T>(assetName);
             yield return request;
 
-            onComplete?.Invoke(request.asset as T);
+            T asset = request.asset as T;
+            if (asset != null)
+                _assetCache[path] = asset;
+            onComplete?.Invoke(asset);
         }
 
         /// <summary>

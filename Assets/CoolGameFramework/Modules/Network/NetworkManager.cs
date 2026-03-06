@@ -18,6 +18,7 @@ namespace CoolGameFramework.Modules
         private NetworkStream _networkStream;
         private bool _isConnected;
         private byte[] _receiveBuffer = new byte[8192];
+        private readonly object _lockObj = new object();
 
         public bool IsConnected => _isConnected;
 
@@ -34,15 +35,21 @@ namespace CoolGameFramework.Modules
                     try
                     {
                         _tcpClient.EndConnect(ar);
-                        _networkStream = _tcpClient.GetStream();
-                        _isConnected = true;
+                        lock (_lockObj)
+                        {
+                            _networkStream = _tcpClient.GetStream();
+                            _isConnected = true;
+                        }
                         onResult?.Invoke(true);
                         BeginReceive();
                     }
                     catch (Exception e)
                     {
                         Debug.LogError($"Connect failed: {e.Message}");
-                        _isConnected = false;
+                        lock (_lockObj)
+                        {
+                            _isConnected = false;
+                        }
                         onResult?.Invoke(false);
                     }
                 }, null);
@@ -59,19 +66,22 @@ namespace CoolGameFramework.Modules
         /// </summary>
         public void Disconnect()
         {
-            if (_networkStream != null)
+            lock (_lockObj)
             {
-                _networkStream.Close();
-                _networkStream = null;
-            }
+                if (_networkStream != null)
+                {
+                    _networkStream.Close();
+                    _networkStream = null;
+                }
 
-            if (_tcpClient != null)
-            {
-                _tcpClient.Close();
-                _tcpClient = null;
-            }
+                if (_tcpClient != null)
+                {
+                    _tcpClient.Close();
+                    _tcpClient = null;
+                }
 
-            _isConnected = false;
+                _isConnected = false;
+            }
         }
 
         /// <summary>
@@ -128,7 +138,15 @@ namespace CoolGameFramework.Modules
         {
             try
             {
-                int length = _networkStream.EndRead(ar);
+                int length;
+                NetworkStream stream;
+                lock (_lockObj)
+                {
+                    if (_networkStream == null) return;
+                    stream = _networkStream;
+                    length = stream.EndRead(ar);
+                }
+
                 if (length > 0)
                 {
                     byte[] data = new byte[length];

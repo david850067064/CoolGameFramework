@@ -208,12 +208,18 @@ namespace CoolGameFramework.Modules
         private System.Func<T> _createFunc;
         private System.Action<T> _onGet;
         private System.Action<T> _onRelease;
+        private System.Action<T> _onDestroy;
+        private int _maxSize;
 
-        public ObjectPool(System.Func<T> createFunc, System.Action<T> onGet = null, System.Action<T> onRelease = null, int initialSize = 10)
+        public int Count => _pool.Count;
+
+        public ObjectPool(System.Func<T> createFunc, System.Action<T> onGet = null, System.Action<T> onRelease = null, int initialSize = 10, int maxSize = 0, System.Action<T> onDestroy = null)
         {
             _createFunc = createFunc;
             _onGet = onGet;
             _onRelease = onRelease;
+            _onDestroy = onDestroy;
+            _maxSize = maxSize;
             _pool = new Stack<T>();
 
             for (int i = 0; i < initialSize; i++)
@@ -232,6 +238,11 @@ namespace CoolGameFramework.Modules
         public void Release(T obj)
         {
             _onRelease?.Invoke(obj);
+            if (_maxSize > 0 && _pool.Count >= _maxSize)
+            {
+                _onDestroy?.Invoke(obj);
+                return;
+            }
             _pool.Push(obj);
         }
 

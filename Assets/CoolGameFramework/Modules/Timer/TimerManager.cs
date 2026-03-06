@@ -62,7 +62,8 @@ namespace CoolGameFramework.Modules
                     timer.Update(deltaTime);
                     if (timer.IsCompleted && !timer.IsLoop)
                     {
-                        _timersToRemove.Add(timer);
+                        if (!_timersToRemove.Contains(timer))
+                            _timersToRemove.Add(timer);
                     }
                 }
             }
@@ -117,7 +118,7 @@ namespace CoolGameFramework.Modules
                 _onComplete?.Invoke();
                 if (IsLoop)
                 {
-                    ElapsedTime = 0f;
+                    ElapsedTime -= Duration; // 保留余数，避免高频定时器累计偏差
                 }
                 else
                 {
