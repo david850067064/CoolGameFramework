@@ -61,6 +61,17 @@ namespace CoolGameFramework.Core
         }
 
         /// <summary>
+        /// 固定帧率更新所有模块（FixedUpdate 节拍）
+        /// </summary>
+        public void FixedUpdate(float fixedDeltaTime)
+        {
+            for (int i = 0; i < _updateModules.Count; i++)
+            {
+                _updateModules[i].OnFixedUpdate(fixedDeltaTime);
+            }
+        }
+
+        /// <summary>
         /// 销毁所有模块
         /// </summary>
         public override void Dispose()

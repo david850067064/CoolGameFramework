@@ -77,6 +77,11 @@ namespace CoolGameFramework.Core
             ModuleManager.Instance.Update(Time.deltaTime);
         }
 
+        private void FixedUpdate()
+        {
+            ModuleManager.Instance.FixedUpdate(Time.fixedDeltaTime);
+        }
+
         private void OnDestroy()
         {
             ModuleManager.Instance.Dispose();
