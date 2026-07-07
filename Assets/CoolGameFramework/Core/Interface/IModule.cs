@@ -21,6 +21,11 @@ namespace CoolGameFramework.Core
         void OnUpdate(float deltaTime);
 
         /// <summary>
+        /// 固定帧率更新（FixedUpdate 节拍）
+        /// </summary>
+        void OnFixedUpdate(float fixedDeltaTime);
+
+        /// <summary>
         /// 模块销毁
         /// </summary>
         void OnDestroy();
